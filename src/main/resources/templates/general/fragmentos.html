@@ -29,7 +29,8 @@
                         <ul class="navbar-nav" sec:authorize="hasRole('ROLE_VENDEDOR') or hasRole('ROLE_ADMIN')">
                             <li class="nav-item px-2"><a class="nav-link" th:href="@{/categoria/listado}">[[#{plantilla.categorias}]]</a></li>
                             <li class="nav-item px-2"><a class="nav-link" th:href="@{/producto/listado}">[[#{plantilla.productos}]]</a></li>
-                            <li class="nav-item px-2"><a class="nav-link" th:href="@{/consultas/listado}">[[#{plantilla.consultas}]]</a></li>                                
+                            <li class="nav-item px-2"><a class="nav-link" th:href="@{/pruebas/listado}">[[#{plantilla.consultas}]]</a></li> 
+                            <li class="nav-item px-2"><a class="nav-link" th:href="@{/pruebas/listado2}">Filtros</a></li>
                             <li class="nav-item dropdown" sec:authorize="hasRole('ROLE_ADMIN')">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
                                     [[#{plantilla.admin}]]</a>

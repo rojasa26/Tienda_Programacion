@@ -5,6 +5,7 @@
 package com.tienda.controller;
 
 import com.tienda.domain.Producto;
+import com.tienda.service.CategoriaService;
 import com.tienda.service.ProductoService;
 import com.tienda.service.FirebaseStorageService;
 import java.util.Locale;
@@ -34,6 +35,9 @@ public class ProductoController {
     private FirebaseStorageService firebaseStorageService; //Guardar Imagenes
 
     @Autowired
+    private CategoriaService categoriaService;
+
+    @Autowired
     private MessageSource messageSource; //Mensaje personalizados (textos personalizados)
 
     @GetMapping("/listado") // https:localhost/producto/listado
@@ -49,6 +53,8 @@ public class ProductoController {
     @PostMapping("/modificar") //https:localhost/producto/modificar
     public String modificar(Producto producto, Model model) {
         producto = productoService.getProducto(producto);
+        var categorias = categoriaService.getCategorias(false);
+        model.addAttribute("categorias", categorias);
         model.addAttribute("producto", producto);
         return "/producto/modifica"; //la vista que tengo que generar en el html
     }
@@ -101,9 +107,14 @@ public class ProductoController {
         }
         return "redirect:/producto/listado";
     }
-    
+
     @GetMapping("/nuevo")//localhost:8080/producto/nuevo
-    public String productoNuevo(Producto producto) {
+    public String productoNuevo(Producto producto, Model model) {
+        var categorias = categoriaService.getCategorias(false); // obtener categorías
+        producto = productoService.getProducto(producto);
+        model.addAttribute("categorias", categorias);
+        model.addAttribute("producto", producto);
+        //model.addAttribute("producto", new Producto()); // objeto vacío para el form
         return "/producto/modifica";
     }
 }
