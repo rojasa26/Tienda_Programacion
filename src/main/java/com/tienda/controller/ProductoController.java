@@ -42,7 +42,7 @@ public class ProductoController {
 
     @GetMapping("/listado") // https:localhost/producto/listado
     public String inicio(Model model) {
-        var productos = productoService.getProductos(false); //obtiene la lista de productos
+        var productos = productoService.getProductos(false); //obtiene  la lista de productos
         model.addAttribute("productos", productos); //aqui paso la informacion al html (productos de color verde)
         //productos = productos.
         model.addAttribute("totalProductos", productos.size());

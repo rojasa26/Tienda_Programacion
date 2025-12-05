@@ -45,9 +45,9 @@ public class CategoriaController {
     }
 
     @PostMapping("/modificar") //https:localhost/categoria/modificar
-    public String modificar(Categoria categoria, Model model) {
-        categoria = categoriaService.getCategoria(categoria);
-        model.addAttribute("categoria", categoria);
+    public String modificar(Integer idCategoria, Model model) {
+        categoria = categoriaService.getCategoria(idCategoria);
+        model.addAttribute("categoria", idCategoria);
         return "/categoria/modifica"; //la vista que tengo que generar en el html
     }
 
