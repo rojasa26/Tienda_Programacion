@@ -1,58 +1,66 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.tienda.service;
 
 import com.tienda.domain.Producto;
 import com.tienda.repository.ProductoRepository;
+import java.io.IOException;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Optional;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-/**
- *
- * @author erick
- */
 @Service
 public class ProductoService {
 
-    @Autowired
-    private ProductoRepository productoRepository; //CRUD R=READ C=CREATE U=UPDATE D=DELETE C-> CREATE (INGRESAR A LA BD Y VOY A CREAR NUEVAS CATEGORIAS 
-    
+    private final ProductoRepository productoRepository;
+    private final FirebaseStorageService firebaseStorageService;
+
+    public ProductoService(ProductoRepository productoRepository, FirebaseStorageService firebaseStorageService) {
+        this.productoRepository = productoRepository;
+        this.firebaseStorageService = firebaseStorageService;
+    }
+
     @Transactional(readOnly = true)
-    public List<Producto> getProductos(boolean activo) { //Read -> Ingresar a la bd pueda leer toda la informacion de la producto
-        var lista = productoRepository.findAll();
-        //producto 2 = Monitor samsung 
-        //producto 3 = Monitor hp 
-        //producto 4 = Monitor lenovo 
+    public List<Producto> getProductos(boolean activo) {
         if (activo) {
-            lista.removeIf(e -> !e.getActivo());
+            return productoRepository.findByActivoTrue();
         }
-        return lista;
+        return productoRepository.findAll();
     }
-    
-    @Transactional //Este metodo funciona para guardar y actualizar
-    public void save(Producto producto){ 
-        productoRepository.save(producto);
-    }
-    
-    @Transactional 
-    public boolean delete(Producto producto){ //Eliminar un Producto
-        try{
-            productoRepository.delete(producto);
-            productoRepository.flush(); 
-            return true;
-        } catch (Exception e){ 
-            return false;
-        }
-    }
-    
+
     @Transactional(readOnly = true)
-    public Producto getProducto(Producto producto){ 
-        return productoRepository.findById(producto.getIdProducto()).orElse(null);
+    public Optional<Producto> getProducto(Integer idProducto) {
+        return productoRepository.findById(idProducto);
     }
+
+    @Transactional
+    public void save(Producto producto, MultipartFile imagenFile) {
+        producto = productoRepository.save(producto);
+        if (!imagenFile.isEmpty()) { //Si no está vacío... pasaron una imagen...
+            String rutaImagen = firebaseStorageService.cargaImagen(
+                    imagenFile, "producto",
+                    producto.getIdProducto());
+            producto.setRutaImagen(rutaImagen);
+            productoRepository.save(producto);
+        }
+    }
+
+    @Transactional
+    public void delete(Integer idProducto) {
+        // Verifica si la categoría existe antes de intentar eliminarlo
+        if (!productoRepository.existsById(idProducto)) {
+            // Lanza una excepción para indicar que el usuario no fue encontrado
+            throw new IllegalArgumentException("La categoría con ID " + idProducto + " no existe.");
+        }
+        try {
+            productoRepository.deleteById(idProducto);
+        } catch (DataIntegrityViolationException e) {
+            // Lanza una nueva excepción para encapsular el problema de integridad de datos
+            throw new IllegalStateException("No se puede eliminar la producto. Tiene datos asociados.", e);
+        }
+    }
+
     
     //Lista de productos con precio inf y sup para la consulta ampliada
     @Transactional(readOnly=true)
