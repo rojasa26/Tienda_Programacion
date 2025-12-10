@@ -4,6 +4,7 @@ import com.tienda.domain.Rol;
 import com.tienda.domain.Usuario;
 import com.tienda.repository.RolRepository;
 import com.tienda.repository.UsuarioRepository;
+import com.tienda.service.FirebaseStorageService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
