@@ -32,7 +32,11 @@ public class PruebasController {
 
     @GetMapping("/listado/{idCategoria}") //localhost:8080/pruebas/listado/categoria=Monitores (categoria=3)
     public String listado(Model model, Categoria categoria) {
-        var productos = categoriaService.getCategoria(categoria).getProductos(); //asociacion
+        var categoriaDb = categoriaService.getCategoria(categoria.getIdCategoria()).orElse(null);
+        if (categoriaDb == null) {
+            return "redirect:/pruebas/listado";
+        }
+        var productos = categoriaDb.getProductos();
         var categorias = categoriaService.getCategorias(false);
         model.addAttribute("productos", productos);
         model.addAttribute("totalProductos", productos.size());
