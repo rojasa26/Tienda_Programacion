@@ -46,7 +46,7 @@ public class CategoriaController {
 
     @PostMapping("/modificar") //https:localhost/categoria/modificar
     public String modificar(Categoria categoria, Model model) {
-        categoria = categoriaService.getCategoria(categoria);
+        categoria = categoriaService.getCategoria(categoria.getIdCategoria()).orElse(null);
         model.addAttribute("categoria", categoria);
         return "/categoria/modifica"; //la vista que tengo que generar en el html
     }
@@ -74,7 +74,7 @@ public class CategoriaController {
 
     @PostMapping("/eliminar")
     public String eliminar(Categoria categoria, RedirectAttributes redirectAttributes) {
-        categoria = categoriaService.getCategoria(categoria);
+        categoria = categoriaService.getCategoria(categoria.getIdCategoria()).orElse(null);
         if (categoria == null) {  // La categoria no existe...
             redirectAttributes.addFlashAttribute("error",
                     messageSource.getMessage("categoria.error01",
